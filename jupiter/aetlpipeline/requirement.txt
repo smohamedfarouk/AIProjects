@@ -1,0 +1,24 @@
+Assignment
+UI + s3 c
+
+Harness engineering: best practice for each layer
+1. RAG/Chunking
+2. MCP
+
+Project:
+First Level
+I want an UI where exactly i can upload my previous data engineering pipelines where it can optimize and
+as wel as give a platform say example aws s3 or snowflake or
+where it can start to create the coding for it connection steps for me it is able to do it, or if it i can share
+the code it can fix the bugs and optimize the code
+
+AI ETL Pipeline Builder Project - Data engineering agent
+
+1. Take any bad data sets csv in your system (s3 or csv file)
+2. Whenever you Load that data into chatbot (rag chatbot) and ask to clean the data
+3. Understand the schema
+4. transform the data accoridng to the schema
+5. Clean this data - Data clensing operations
+4. Load into mysql data base
+ (we need to provide mysql datbaase login credentials to our LLM mOdel)
+

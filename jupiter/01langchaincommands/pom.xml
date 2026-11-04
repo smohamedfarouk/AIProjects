@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.jupiter</groupId>
+    <artifactId>langchaincommands</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <!-- keep parameter names in the class files, so LangChain4j shows tool arguments to the model by their real
+             names (e.g. "items", "query") instead of "arg0" - meaningful names make tool calls more accurate -->
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <langchain4j.version>1.22.0</langchain4j.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.11.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+            </plugin>
+            <!--
+                One entry point per demo (see README.md):
+                  mvn compile exec:java@without-tavily   Requirement 1A: the plain LLM, no internet search
+                  mvn compile exec:java@with-tavily      Requirement 1B: deep agent with Tavily internet search
+                  mvn compile exec:java@messages         Requirement 2.1: SystemMessage + HumanMessage
+                  mvn compile exec:java@draft-template   Requirement 2.2a: ChatPromptTemplate chain - draft email
+                  mvn compile exec:java@medical-template Requirement 2.2b: ChatPromptTemplate chain - medicine summary
+                  mvn compile exec:java@reflection       Requirement 2.3: draft -> critique -> refine
+                From morelangchaincommands.ipynb:
+                  mvn compile exec:java@invoke            More 1: llm.invoke - the simplest call
+                  mvn compile exec:java@messages-template More 2: ChatPromptTemplate.from_messages
+                  mvn compile exec:java@structured-output More 3: structured output (CourseInfo)
+                  mvn compile exec:java@tool-calls        More 4a: tool calling - what the model asks for
+                  mvn compile exec:java@tool-loop         More 4b: tool calling - run tools, send results back
+                  mvn compile exec:java@web-loader        RAG 1: load a web page (no API key)
+                  mvn compile exec:java@chunking          RAG 2: split text into chunks (no API key)
+                  mvn compile exec:java@embeddings        RAG 3: embeddings
+                  mvn compile exec:java@vector-search     RAG 4: vector store similarity search
+                  mvn compile exec:java@rag-chain         RAG 5: retrieve + answer
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>without-tavily</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.search.LlmWithoutTavilyMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>with-tavily</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.search.DeepAgentWithTavilyMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>messages</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.chat.messages.SystemHumanMessagesMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>draft-template</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.chat.chatprompttemplate.DraftEmailTemplateMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>medical-template</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.chat.chatprompttemplate.MedicalTemplateMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>reflection</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.chat.selfcorrectingprompt.ReflectionMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>invoke</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.chat.invoke.SimpleInvokeMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>messages-template</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.chat.chatprompttemplate.MessagesTemplateMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>structured-output</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.chat.structuredoutput.StructuredOutputMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tool-calls</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.tools.ToolCallRequestMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tool-loop</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.tools.ToolCallLoopMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>web-loader</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.rag.loader.WebLoaderMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>chunking</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.rag.chunking.ChunkingMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>embeddings</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.rag.embeddings.EmbeddingsMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>vector-search</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.rag.vectorstore.VectorStoreSearchMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>rag-chain</id>
+                        <configuration>
+                            <mainClass>com.jupiter.langchaincommands.rag.ragchain.RagChainMain</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

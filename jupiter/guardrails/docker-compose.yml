@@ -1,0 +1,25 @@
+# MySQL for the text-to-SQL agent. Credentials come from jupiter/.env:
+#   docker compose --env-file ../.env up -d
+# Sample data in mysql/init is loaded only on first start (when the volume is empty).
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: guardrails-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "127.0.0.1:${MYSQL_PORT}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      retries: 20
+
+volumes:
+  mysql-data:

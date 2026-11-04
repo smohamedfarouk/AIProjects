@@ -1,0 +1,2 @@
+uv pip install -r .\awsbedrock\requirement.txt
+uv pip install jupyter ipykernel langchain-aws boto3 python-dotenv

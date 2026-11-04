@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BEPEC Memory Chatbot</title>
+<style>
+  :root { --bg:#ffffff; --fg:#1f2328; --muted:#656d76; --user:#eef2ff; --bot:#f6f8fa; --border:#d0d7de; --accent:#4f46e5; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0e1117; --fg:#e6edf3; --muted:#8b949e; --user:#1e2340; --bot:#161b22; --border:#30363d; --accent:#818cf8; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--bg); color:var(--fg); }
+  .layout { display:flex; min-height:100vh; }
+  aside { width:240px; border-right:1px solid var(--border); padding:20px 16px; }
+  aside h2 { font-size:16px; margin:0 0 12px; }
+  aside button { width:100%; padding:8px; border:1px solid var(--border); border-radius:8px; background:var(--bot); color:var(--fg); cursor:pointer; }
+  aside hr { border:0; border-top:1px solid var(--border); margin:16px 0; }
+  main { flex:1; min-width:0; max-width:760px; margin:0 auto; padding:24px 16px 0; display:flex; flex-direction:column; }
+  h1 { margin:0; font-size:28px; }
+  .caption { color:var(--muted); margin:4px 0 24px; font-size:14px; }
+  .msg { padding:12px 14px; border-radius:10px; margin:10px 0; white-space:pre-wrap; line-height:1.5; }
+  .msg.user { background:var(--user); }
+  .msg.assistant { background:var(--bot); border:1px solid var(--border); }
+  .msg .role { font-size:12px; font-weight:600; color:var(--muted); display:block; margin-bottom:4px; }
+  .thinking { color:var(--muted); font-style:italic; }
+  #chat { min-height:0; }
+  form { position:sticky; bottom:0; padding:12px 0 16px; background:var(--bg); display:flex; gap:8px; }
+  form input { flex:1; min-width:0; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--bot); color:var(--fg); font-size:15px; }
+  form button { padding:12px 18px; border:0; border-radius:10px; background:var(--accent); color:#fff; cursor:pointer; }
+  @media (max-width: 700px) {
+    .layout { flex-direction:column; }
+    aside { width:auto; border-right:0; border-bottom:1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <h2>Controls</h2>
+    <button id="clear" type="button">Clear Conversation</button>
+    <hr>
+    <strong>About this bot</strong>
+    <p>BEPEC Assistant</p>
+  </aside>
+  <main>
+    <h1>📌 BEPEC Memory Chatbot</h1>
+    <p class="caption">Powered by OpenAI + LangChain4j (few-shot)</p>
+    <div id="chat"></div>
+    <form id="form">
+      <input id="input" placeholder="Ask me anything..." autocomplete="off" autofocus>
+      <button type="submit">Send</button>
+    </form>
+  </main>
+</div>
+<script>
+  const chat = document.getElementById('chat');
+  const form = document.getElementById('form');
+  const input = document.getElementById('input');
+
+  function add(role, text, cls) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + role + (cls ? ' ' + cls : '');
+    const label = document.createElement('span');
+    label.className = 'role';
+    label.textContent = role === 'user' ? 'You' : 'Assistant';
+    const body = document.createElement('span');
+    body.textContent = text;
+    div.append(label, body);
+    chat.append(div);
+    form.scrollIntoView({block: 'end'});
+    return body;
+  }
+
+  async function load() {
+    const res = await fetch('/api/history');
+    const data = await res.json();
+    chat.innerHTML = '';
+    data.messages.forEach(m => add(m.role, m.text));
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    add('user', text);
+    const body = add('assistant', 'Thinking...', 'thinking');
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: text})
+      });
+      const data = await res.json();
+      body.textContent = data.reply ?? ('Error: ' + data.error);
+    } catch (err) {
+      body.textContent = 'Sorry, something went wrong: ' + err;
+    }
+    body.parentElement.classList.remove('thinking');
+  });
+
+  document.getElementById('clear').addEventListener('click', async () => {
+    await fetch('/api/clear', {method: 'POST'});
+    chat.innerHTML = '';
+    input.focus();
+  });
+
+  load();
+</script>
+</body>
+</html>
