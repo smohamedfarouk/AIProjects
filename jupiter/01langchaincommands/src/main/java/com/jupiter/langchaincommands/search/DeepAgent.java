@@ -119,7 +119,7 @@ public final class DeepAgent {
         public String internet_search(@P("search query") String query,
                                       @P("maximum number of results; use 5 unless more are needed") int maxResults) {
             log("internet_search", query + " (max " + maxResults + ")");
-            return tavily.  Osearch(query, maxResults);
+            return tavily.search(query, maxResults);
         }
 
         @Tool("Create or replace the todo list used to plan and track a multi-step task. "

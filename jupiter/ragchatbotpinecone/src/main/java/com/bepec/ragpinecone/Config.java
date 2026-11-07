@@ -74,6 +74,30 @@ public final class Config {
         }
     }
 
+    /**
+     * Resolves a file setting such as PDF_PATH. A relative path is tried against the working directory, then the
+     * project folder (two levels above target/classes), then the folder holding .env - so it works whether the app
+     * is started from the project folder, the repo root (IntelliJ's default) or anywhere else.
+     */
+    public static Path resolveFile(String setting) {
+        Path path = Path.of(setting);
+        if (path.isAbsolute() || Files.exists(path)) {
+            return path;
+        }
+        Path classes = codeLocation();
+        Path projectDir = classes != null && classes.getParent() != null ? classes.getParent().getParent() : null;
+        Path envDir = findEnvDir(Path.of("").toAbsolutePath());
+        if (envDir == null && classes != null) {
+            envDir = findEnvDir(classes);
+        }
+        for (Path base : new Path[] {projectDir, envDir}) {
+            if (base != null && Files.exists(base.resolve(path))) {
+                return base.resolve(path);
+            }
+        }
+        return path;
+    }
+
     /** Environment variables win over values from .env. */
     public static String env(String name) {
         String value = System.getenv(name);

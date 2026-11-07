@@ -90,7 +90,7 @@ public final class RagChatbotMain {
      */
     public static void main(String[] args) throws IOException {
         String pdfSetting = args.length > 0 ? args[0] : Config.env("PDF_PATH");
-        Path pdf = Path.of(pdfSetting == null || pdfSetting.isBlank() ? Config.DEFAULT_PDF : pdfSetting);
+        Path pdf = Config.resolveFile(pdfSetting == null || pdfSetting.isBlank() ? Config.DEFAULT_PDF : pdfSetting);
 
         RagPipeline rag = new RagPipeline(Config.embeddings(), Config.llm());
 

@@ -5,12 +5,14 @@ import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiTokenCountEstimator;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Application configuration: loads the OpenAI API key from .env (or the
@@ -51,14 +53,21 @@ public class ChatbotConfig {
         return apiKey;
     }
 
-    /** Nearest directory containing a .env file, starting at the working dir and walking up. */
+    /**
+     * Nearest directory containing a .env file. Walks up from the working dir first,
+     * then from the app's own location (the jar or target/classes), so it finds
+     * jupiter/.env no matter which folder the app is started from.
+     */
     private static Path findEnvDirectory() {
-        Path start = Paths.get("").toAbsolutePath();
-        for (Path dir = start; dir != null; dir = dir.getParent()) {
-            if (Files.isRegularFile(dir.resolve(".env"))) {
-                return dir;
+        Path workingDir = Paths.get("").toAbsolutePath();
+        Path appDir = new ApplicationHome(ChatbotConfig.class).getDir().toPath().toAbsolutePath();
+        for (Path start : List.of(workingDir, appDir)) {
+            for (Path dir = start; dir != null; dir = dir.getParent()) {
+                if (Files.isRegularFile(dir.resolve(".env"))) {
+                    return dir;
+                }
             }
         }
-        return start;
+        return workingDir;
     }
 }

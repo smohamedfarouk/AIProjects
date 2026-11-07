@@ -106,7 +106,7 @@ public final class PdfRagChatbotMain {
 
         if (!skipIndex) {
             String pdfSetting = !rest.isEmpty() ? rest.removeFirst() : Config.env("PDF_PATH");
-            Path pdf = Path.of(pdfSetting == null || pdfSetting.isBlank() ? Config.DEFAULT_PDF : pdfSetting);
+            Path pdf = Config.resolveFile(pdfSetting == null || pdfSetting.isBlank() ? Config.DEFAULT_PDF : pdfSetting);
 
             var pages = PdfLoader.load(pdf);
             System.out.println("Loaded " + pages.size() + " pages from " + pdf.getFileName());
