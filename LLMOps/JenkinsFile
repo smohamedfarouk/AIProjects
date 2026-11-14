@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    // environment {
+    //     SONAR_PROJECT_KEY = "LLMOps"
+    //     SONAR_SCANNER_HOME = tool 'Sonarqube'
+    //     AWS_REGION = "eu-west-1"
+    //     ECR_REPOSITORY = "llmops"
+    //     IMAGE_NAME = "llmops"
+    // }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/smohamedfarouk/AIProjects.git'
+            }
+        }
+
+        // stage('SonarQube Analysis') {
+        //     steps {
+        //         withSonarQubeEnv('Sonarqube') {
+        //             sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_LOGIN}"
+        //         }
+        //     }
+        // }
+        // stage('Build Docker Image') {
+        //     steps {
+        //         script {
+        //             def imageTag = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_NAME}"
+        //             sh "docker build -t ${imageTag} ."
+        //         }
+        //     }
+        // }
+
+        // stage('Push Docker Image to ECR') {
+        //     steps {
+        //         script {
+        //             def imageTag = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_NAME}"
+        //             sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        //             sh "docker push ${imageTag}"
+        //         }
+        //     }
+        // }
+    }
+
+
+   
+}
