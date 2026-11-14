@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout()
+    }
+
     // environment {
     //     SONAR_PROJECT_KEY = "LLMOps"
     //     SONAR_SCANNER_HOME = tool 'Sonarqube'
@@ -12,7 +16,17 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/smohamedfarouk/AIProjects.git'
+                    url: 'https://github.com/smohamedfarouk/AIProjects.git',
+                    credentialsId: 'github-credentials'
+            
+            }
+        }
+
+        stage('Verify LLMOps') {
+            steps {
+                dir('LLMOps') {
+                    sh 'test -f requirement.txt && test -f app/main.py'
+                }
             }
         }
 
