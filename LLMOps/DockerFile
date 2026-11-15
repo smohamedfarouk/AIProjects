@@ -23,4 +23,4 @@ ENV STREAMLIT_SERVER_ENABLE_CORS=false
 ENV STREAMLIT_SERVER_RUN_ON_SAVE=false
 
 
-CMD ["python", "run", "app/main.py"]
+CMD ["python", "-m", "app.main"]
