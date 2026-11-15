@@ -57,5 +57,18 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to Fargate') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'llmops-aws-credentials']]) {
+                echo "Deploying to Fargate..."
+                script {
+                    sh "echo Deploying to Fargate..."
+                    sh "aws ecs update-service --cluster llmops-cluster --service llmops-task-definition-service-7gb2j3hw --force-new-deployment"    
+                    sh "aws ecs wait services-stable --cluster llmops-cluster --services llmops-task-definition-service-7gb2j3hw"
+                    // Add your Fargate deployment commands here
+                }
+                // Add your Fargate deployment commands here
+            }
+        }
     }
 }
