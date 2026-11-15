@@ -1,0 +1,26 @@
+FROM python:3.11-slim
+
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+
+COPY requirement.txt .
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+
+COPY . .
+RUN pip install --no-cache-dir -r requirement.txt
+EXPOSE 8501
+EXPOSE 9999
+
+ENV STREAMLIT_SERVER_PORT=8501
+ENV STREAMLIT_SERVER_HEADLESS=true
+ENV STREAMLIT_SERVER_ENABLE_CORS=false
+ENV STREAMLIT_SERVER_RUN_ON_SAVE=false
+
+
+CMD ["python", "run", "app/main.py"]

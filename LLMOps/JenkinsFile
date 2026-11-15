@@ -5,13 +5,13 @@ pipeline {
         skipDefaultCheckout()
     }
 
-    // environment {
-    //     SONAR_PROJECT_KEY = "LLMOps"
-    //     SONAR_SCANNER_HOME = tool 'Sonarqube'
+     environment {
+        SONAR_PROJECT_KEY = "LLMOps"
+        SONAR_SCANNER_HOME = tool 'sonarqube-scanner'
     //     AWS_REGION = "eu-west-1"
-    //     ECR_REPOSITORY = "llmops"
+    //     ECR_REPOSITORY = "llmops"sonarqube-custom 
     //     IMAGE_NAME = "llmops"
-    // }
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -30,13 +30,17 @@ pipeline {
             }
         }
 
-        // stage('SonarQube Analysis') {
-        //     steps {
-        //         withSonarQubeEnv('Sonarqube') {
-        //             sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_LOGIN}"
-        //         }
-        //     }
-        // }
+        stage('SonarQube Analysis') {
+            steps {
+                dir('LLMOps') {
+                    withCredentials([string(credentialsId: 'Sonarqube', variable: 'SONAR_TOKEN')]) {
+                        withSonarQubeEnv('sonar-env') {
+                            sh '"$SONAR_SCANNER_HOME/bin/sonar-scanner" -Dsonar.projectKey="$SONAR_PROJECT_KEY" -Dsonar.host.url="$SONAR_HOST_URL"'
+                        }
+                    }
+                }
+            }
+        }
         // stage('Build Docker Image') {
         //     steps {
         //         script {
