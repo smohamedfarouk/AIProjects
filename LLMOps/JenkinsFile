@@ -49,7 +49,7 @@ pipeline {
                         sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
                         dir('LLMOps') {
-                            sh "docker build -t ${ECR_REPOSITORY_URI}:${IMAGE_NAME} ."
+                            sh "docker build -f DockerFile -t ${ECR_REPOSITORY_URI}:${IMAGE_NAME} ."
                         }
                         sh "docker tag ${ECR_REPOSITORY_URI}:${IMAGE_NAME} ${ECR_REPOSITORY_URI}:${IMAGE_NAME}"
                         sh "docker push ${ECR_REPOSITORY_URI}:${IMAGE_NAME}"
